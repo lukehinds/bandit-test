@@ -35,10 +35,11 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: docker/Dockerfile-py${{ matrix.python-version }}
+        file: ./docker/Dockerfile-py${{ matrix.python-version }}
         push: true
         tags: ghcr.io/${{ github.repository }}/bandit:py${{ matrix.python-version }}-${{ matrix.architecture }}
         platforms: linux/${{ matrix.architecture }}
+
 
     - name: Sign the published Docker image
       if: ${{ github.event_name != 'pull_request' }}
