@@ -15,7 +15,7 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['38', '39', '310', '311', '312']
         architecture: [amd64, arm64]
     steps:
     - name: Check out the repo
@@ -37,20 +37,18 @@ jobs:
         cosign-release: 'v2.2.2'
 
     - name: Build and push Docker image
+      id: build-and-push
       uses: docker/build-push-action@v4
       with:
         context: .
-        file: ./docker/Dockerfile
-        build-args: PYTHON_VERSION=${{ matrix.python-version }}
+        file: ./docker/Dockerfile-py${{ matrix.python-version }}
         push: true
         tags: ghcr.io/${{ github.repository }}/bandit:py${{ matrix.python-version }}-${{ matrix.architecture }}
         platforms: linux/${{ matrix.architecture }}
-      
 
     - name: Sign the image
       env:
         TAGS: ghcr.io/${{ github.repository }}/bandit:py${{ matrix.python-version }}-${{ matrix.architecture }}
         DIGEST: ${{ steps.build-and-push.outputs.digest }}
       run: |
-        cosign sign --yes ${TAGS}@${DIGEST}
-      
+       echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
