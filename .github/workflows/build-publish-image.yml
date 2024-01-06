@@ -52,4 +52,5 @@ jobs:
         TAGS: ghcr.io/${{ github.repository }}/bandit:py${{ matrix.python-version }}-${{ matrix.architecture }}
         DIGEST: ${{ steps.build-and-push.outputs.digest }}
       run: |
-       echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+        cosign sign --yes ${TAGS}@${DIGEST}
+      
