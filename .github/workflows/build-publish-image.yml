@@ -10,6 +10,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
     strategy:
       matrix:
         python-version: ['38', '39', '310', '311', '312']
@@ -44,13 +47,12 @@ jobs:
         platforms: linux/${{ matrix.architecture }}
 
 
-    - name: Sign the images with GitHub OIDC Token
+    - name: Sign the published Docker image
+      if: ${{ github.event_name != 'pull_request' }}
       env:
+        # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
+        TAGS: ${{ steps.meta.outputs.tags }}
         DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        TAGS: ${{ steps.docker_meta.outputs.tags }}
-      run: |
-        images=""
-        for tag in ${TAGS}; do
-          images+="${tag}@${DIGEST} "
-        done
-        cosign sign --yes ${images}
+      # This step uses the identity token to provision an ephemeral certificate
+      # against the sigstore community Fulcio instance.
+      run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
