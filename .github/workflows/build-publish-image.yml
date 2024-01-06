@@ -41,10 +41,11 @@ jobs:
       with:
         context: .
         file: ./docker/Dockerfile
-        build-args: PYTHON_VERSION=3.${{ matrix.python-version }}
+        build-args: PYTHON_VERSION=${{ matrix.python-version }}
         push: true
         tags: ghcr.io/${{ github.repository }}/bandit:py${{ matrix.python-version }}-${{ matrix.architecture }}
         platforms: linux/${{ matrix.architecture }}
+      
 
     - name: Sign the image
       env:
