@@ -1,15 +1,3 @@
-#
-# Copyright 2024 Bandit Authors
-#
-# SPDX-License-Identifier: Apache-2.0
-# #############################################################################
-# Bandit Baseline is a tool that runs Bandit against a Git commit, and compares
-# the current commit findings to the parent commit findings.
-# To do this it checks out the parent commit, runs Bandit (with any provided
-# filters or profiles), checks out the current commit, runs Bandit, and then
-# reports on any new findings.
-# #############################################################################
-
 FROM python:3.12-alpine
 
 # Install Git (required for pbr versioning)
@@ -26,4 +14,3 @@ RUN pip install .
 
 # Define entrypoint and default command
 ENTRYPOINT ["bandit"]
-
